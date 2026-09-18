@@ -1,12 +1,6 @@
 # xmip-core-authorize-role
 
-Authorize by role: decides by the roles the identity holds, from a role store; a transport-layer policy. A technology of
-[xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
-
-Declared and not yet written; `architecture.toml` carries the maturity. When
-it is written it implements `Authorizer`, one mechanism at one gate (ADR-0050).
-What it may depend on is `repository-model.md` section 4 and ADR-0044: its
-capability, and no sibling.
+Role authorization: assigns roles to an identity from its Party, its recorded value, a claim it carries or the organizational unit of its name, and can refuse an identity that holds none. A technology of [xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
 
 ## Toolchain
 
