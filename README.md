@@ -1,6 +1,6 @@
 # xmip-core-authorize-role
 
-Role authorization: assigns roles to an identity from its Party, its recorded value, a claim it carries or the organizational unit of its name, and can refuse an identity that holds none. A technology of [xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
+Role authorization: assigns roles to an identity from its Party or its recorded value — the capability's `Subject` — or from a claim it carries, one entry per value, or the organizational unit of its name (`Assignee`), and can refuse an identity that holds none. A technology of [xmip-core-authorize](https://github.com/IlleNilsson/xmip-core-authorize).
 
 ## Toolchain
 

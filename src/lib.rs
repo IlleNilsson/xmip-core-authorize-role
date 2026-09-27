@@ -5,7 +5,7 @@
 //! One policy at the transport layer: the roles the identity holds, from a
 //! role store (ADR-0050 section 5). A Party is recognized; a role is granted
 //! (ADR-0009, ADR-0019 clause 4). The [`RoleStore`] is where the granting is
-//! written down: each assignment names a [`Subject`] — a Party, a recorded
+//! written down: each assignment names an [`Assignee`] — a Party, a recorded
 //! value, a claim carried as evidence, the organizational unit of a
 //! distinguished name — and the roles it holds. [`RoleStore::roles_of`]
 //! reads an identity's roles from both layers of the record, because a Party
@@ -19,13 +19,13 @@
 //! so the roles computed here do not travel on them; a hook in the
 //! capability is what would carry them to `rbac`.
 
-pub mod subject;
+mod assignee;
 
 use authorize::{Attempt, Authorizer, Decision};
 use context::IdentityFacts;
 use xcore::Layer;
 
-pub use subject::Subject;
+pub use assignee::Assignee;
 
 /// The manifest leaf, and the name a denial carries.
 pub const NAME: &str = "role";
@@ -33,7 +33,7 @@ pub const NAME: &str = "role";
 /// Who holds which roles.
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct RoleStore {
-    assignments: Vec<(Subject, Vec<String>)>,
+    assignments: Vec<(Assignee, Vec<String>)>,
     required: bool,
 }
 
@@ -43,12 +43,12 @@ impl RoleStore {
         Self::default()
     }
 
-    /// Grant roles to a subject. A subject may appear more than once; the
+    /// Grant roles to an assignee. One may appear more than once; the
     /// roles add up.
     #[must_use]
-    pub fn assign(mut self, subject: Subject, roles: &[&str]) -> Self {
+    pub fn assign(mut self, assignee: Assignee, roles: &[&str]) -> Self {
         self.assignments
-            .push((subject, roles.iter().map(ToString::to_string).collect()));
+            .push((assignee, roles.iter().map(ToString::to_string).collect()));
         self
     }
 
@@ -65,12 +65,12 @@ impl RoleStore {
     /// message identity.
     #[must_use]
     pub fn roles_of(&self, identity: &IdentityFacts) -> Vec<String> {
-        let mut roles: Vec<String> = std::iter::once(&identity.transport)
-            .chain(identity.message.as_ref())
+        let mut roles: Vec<String> = identity
+            .held()
             .flat_map(|held| {
                 self.assignments
                     .iter()
-                    .filter(move |(subject, _)| subject.matches(held))
+                    .filter(move |(assignee, _)| assignee.matches(held))
                     .flat_map(|(_, roles)| roles.iter().cloned())
             })
             .collect();
@@ -141,10 +141,10 @@ mod tests {
 
     fn store() -> RoleStore {
         RoleStore::new()
-            .assign(Subject::party(PartyId::new(1)), &["partner"])
-            .assign(Subject::claim("groups", "shippers"), &["shipper"])
-            .assign(Subject::unit("Logistics"), &["shipper", "logistics"])
-            .assign(Subject::identity("ISA06=PARTNERX"), &["edi-sender"])
+            .assign(Assignee::party(PartyId::new(1)), &["partner"])
+            .assign(Assignee::claim("groups", "shippers"), &["shipper"])
+            .assign(Assignee::unit("Logistics"), &["shipper", "logistics"])
+            .assign(Assignee::identity("ISA06=PARTNERX"), &["edi-sender"])
     }
 
     #[test]
