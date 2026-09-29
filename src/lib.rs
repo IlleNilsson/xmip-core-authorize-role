@@ -118,7 +118,7 @@ mod tests {
     fn certificate(party: Option<PartyId>) -> AuthenticatedIdentity {
         let identity = AuthenticatedIdentity::new(
             mechanism::mutual_tls(),
-            "CN=partner-x.example, OU=Logistics, O=Partner X",
+            "CN=party-x.example, OU=Logistics, O=Party X",
             Established::Passed,
             Verified::Proven,
         )
@@ -133,7 +133,7 @@ mod tests {
     fn isa06() -> AuthenticatedIdentity {
         AuthenticatedIdentity::new(
             mechanism::edi_x12_interchange(),
-            "ISA06=PARTNERX",
+            "ISA06=PARTYX",
             Established::Detected,
             Verified::Claimed,
         )
@@ -141,10 +141,10 @@ mod tests {
 
     fn store() -> RoleStore {
         RoleStore::new()
-            .assign(Assignee::party(PartyId::new(1)), &["partner"])
+            .assign(Assignee::party(PartyId::new(1)), &["party"])
             .assign(Assignee::claim("groups", "shippers"), &["shipper"])
             .assign(Assignee::unit("Logistics"), &["shipper", "logistics"])
-            .assign(Assignee::identity("ISA06=PARTNERX"), &["edi-sender"])
+            .assign(Assignee::identity("ISA06=PARTYX"), &["edi-sender"])
     }
 
     #[test]
@@ -157,7 +157,7 @@ mod tests {
 
         assert_eq!(
             store().roles_of(&facts),
-            vec!["edi-sender", "logistics", "partner", "shipper"]
+            vec!["edi-sender", "logistics", "party", "shipper"]
         );
     }
 
@@ -166,7 +166,7 @@ mod tests {
         let facts = IdentityFacts::evaluate(Alignment::None, certificate(None), None);
 
         assert_eq!(
-            store().decide(&facts, &Attempt::new(Action::Receive, "partner-x")),
+            store().decide(&facts, &Attempt::new(Action::Receive, "party-x")),
             None
         );
         assert_eq!(store().name(), "role");
@@ -187,7 +187,7 @@ mod tests {
         );
         let decision = store()
             .require_a_role()
-            .decide(&nobody, &Attempt::new(Action::Receive, "partner-x"))
+            .decide(&nobody, &Attempt::new(Action::Receive, "party-x"))
             .expect("an opinion");
 
         assert_eq!(
@@ -195,7 +195,7 @@ mod tests {
             "denied by role: basic=alice holds no role, and this store requires one"
         );
         assert_eq!(
-            store().decide(&nobody, &Attempt::new(Action::Receive, "partner-x")),
+            store().decide(&nobody, &Attempt::new(Action::Receive, "party-x")),
             None
         );
     }
