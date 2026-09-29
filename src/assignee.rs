@@ -97,7 +97,7 @@ mod tests {
     fn certificate() -> AuthenticatedIdentity {
         AuthenticatedIdentity::new(
             mechanism::mutual_tls(),
-            "CN=partner-x.example, OU=Logistics, OU=Nordics, O=Partner X",
+            "CN=party-x.example, OU=Logistics, OU=Nordics, O=Party X",
             Established::Passed,
             Verified::Proven,
         )
@@ -111,20 +111,20 @@ mod tests {
         assert!(Assignee::party(PartyId::new(1)).matches(&certificate()));
         assert!(!Assignee::party(PartyId::new(2)).matches(&certificate()));
         assert!(
-            Assignee::identity("CN=partner-x.example, OU=Logistics, OU=Nordics, O=Partner X")
+            Assignee::identity("CN=party-x.example, OU=Logistics, OU=Nordics, O=Party X")
                 .matches(&certificate())
         );
         assert!(
             Assignee::identity_by(
                 "mutual-tls",
-                "CN=partner-x.example, OU=Logistics, OU=Nordics, O=Partner X"
+                "CN=party-x.example, OU=Logistics, OU=Nordics, O=Party X"
             )
             .matches(&certificate())
         );
         assert!(
             !Assignee::identity_by(
                 "basic",
-                "CN=partner-x.example, OU=Logistics, OU=Nordics, O=Partner X"
+                "CN=party-x.example, OU=Logistics, OU=Nordics, O=Party X"
             )
             .matches(&certificate())
         );
@@ -148,7 +148,7 @@ mod tests {
         assert!(Assignee::unit("Logistics").matches(&certificate()));
         assert!(Assignee::unit("Nordics").matches(&certificate()));
         assert!(
-            !Assignee::unit("Partner X").matches(&certificate()),
+            !Assignee::unit("Party X").matches(&certificate()),
             "that is O"
         );
         assert_eq!(Assignee::unit("Nordics").to_string(), "OU='Nordics'");
