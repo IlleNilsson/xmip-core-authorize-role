@@ -166,7 +166,7 @@ mod tests {
         let facts = IdentityFacts::evaluate(Alignment::None, certificate(None), None);
 
         assert_eq!(
-            store().decide(&facts, &Attempt::new(Action::Receive, "party-x")),
+            store().decide(&facts, &Attempt::now(Action::Receive, "party-x")),
             None
         );
         assert_eq!(store().name(), "role");
@@ -187,7 +187,7 @@ mod tests {
         );
         let decision = store()
             .require_a_role()
-            .decide(&nobody, &Attempt::new(Action::Receive, "party-x"))
+            .decide(&nobody, &Attempt::now(Action::Receive, "party-x"))
             .expect("an opinion");
 
         assert_eq!(
@@ -195,7 +195,7 @@ mod tests {
             "denied by role: basic=alice holds no role, and this store requires one"
         );
         assert_eq!(
-            store().decide(&nobody, &Attempt::new(Action::Receive, "party-x")),
+            store().decide(&nobody, &Attempt::now(Action::Receive, "party-x")),
             None
         );
     }
@@ -209,7 +209,7 @@ mod tests {
         assert_eq!(
             store()
                 .require_a_role()
-                .decide(&facts, &Attempt::new(Action::Send, "Billing")),
+                .decide(&facts, &Attempt::now(Action::Send, "Billing")),
             None
         );
         assert_eq!(store().roles_of(&facts), vec!["logistics", "shipper"]);
